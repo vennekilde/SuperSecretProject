@@ -1,4 +1,4 @@
-package supersecretprojectlocalproject;
+package supersecretproject;
 
 /*
  * Author: Jeppe Boysen Vennekilde
