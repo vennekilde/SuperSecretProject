@@ -1,6 +1,4 @@
-package SSP;
-
-import org.bukkit.plugin.java.JavaPlugin;
+package supersecretproject.Instances;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -32,15 +30,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class SuperSecretProject extends JavaPlugin{
-
-    public static String directory = "plugins/SSP/";
+public class Stage {
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-
 }
