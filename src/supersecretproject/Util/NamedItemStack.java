@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 import net.minecraft.server.NBTTagString;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
  
 public class NamedItemStack {
+ 
     private CraftItemStack                    craftStack;
     private net.minecraft.server.ItemStack    itemStack;
  
@@ -20,10 +22,9 @@ public class NamedItemStack {
             craftStack = new CraftItemStack(item);
             itemStack = craftStack.getHandle();
         }
-        CraftItemStack cis = ((CraftItemStack)this.craftStack);
-        NBTTagCompound tag = cis.getHandle().getTag();
+        NBTTagCompound tag = craftStack.getHandle().getTag();
         if (tag == null) {
-            cis.getHandle().setTag(new NBTTagCompound());
+            craftStack.getHandle().setTag(new NBTTagCompound());
         }
     }
     public NamedItemStack(String name,ItemStack item) {
@@ -76,7 +77,7 @@ public class NamedItemStack {
         strings.toArray(lores);
         return lores;
     }
-    
+        
     public NBTTagList getLore()
     {
         if (!hasDisplay())
@@ -92,7 +93,10 @@ public class NamedItemStack {
         return lore;
     }
  
-    public NamedItemStack setLore(String lore)
+    public NamedItemStack setLore(String lore){
+        return setLore(lore,ChatColor.GRAY);
+    }
+    public NamedItemStack setLore(String lore,ChatColor startColor)
     {
         if(!hasDisplay())
         {
@@ -106,7 +110,7 @@ public class NamedItemStack {
         // Add each line
         for(String line : loreLines)
         {
-             l.add(new NBTTagString("", line));
+             l.add(new NBTTagString("", startColor + line));
         }
         // Set the lore
         display.set("Lore", l);
@@ -114,6 +118,9 @@ public class NamedItemStack {
     }
     
     public NamedItemStack addLore(String lore){
+        return addLore(lore,ChatColor.GRAY);
+    }
+    public NamedItemStack addLore(String lore,ChatColor startColor){
         if(hasDisplay() == false){
             this.addDisplay();
         }
@@ -126,7 +133,7 @@ public class NamedItemStack {
         // Add each line
         for(String line : loreLines)
         {
-             l.add(new NBTTagString("", line));
+             l.add(new NBTTagString("", startColor + line));
         }
         // Set the lore
         display.set("Lore", l);
