@@ -1,5 +1,7 @@
 package supersecretproject.Util;
 
+import info.jeppes.ZoneCore.ZoneConfig;
+import info.jeppes.ZoneCore.ZoneCore;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -10,7 +12,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import SSP.SuperSecretProject;
+import supersecretproject.SSPAPI;
+import supersecretproject.SuperSecretProject;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -43,9 +46,20 @@ import SSP.SuperSecretProject;
  */
 
 public class MSG {
-    public static File errorFileLog = new File(SuperSecretProject.directory+"Logs/errors.log");
+    public static File errorFileLog = null;
     public static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     public static Date date = new Date();
+    
+    public MSG(){
+        errorFileLog = new File(SSPAPI.getPlugin().getZoneCore().getPluginDirectory()+"/Logs/errors.log");
+        if(!errorFileLog.exists()){
+            try {
+                errorFileLog.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(ZoneConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
     
     public static void outputErrorMessage(String message){
         Bukkit.getLogger().log(Level.WARNING, message);

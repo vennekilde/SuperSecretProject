@@ -1,6 +1,8 @@
-package supersecretproject.Instances.HardcodedInstances;
+package supersecretproject.Instances;
 
-import supersecretproject.Instances.Instance;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+import supersecretproject.SSPAPI;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -32,8 +34,13 @@ import supersecretproject.Instances.Instance;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class TestInstance extends Instance{
-    public TestInstance(){
-        super("test instance");
-    }
+public abstract class InstanceStarter implements Listener{
+    
+    public void initInstanceStarterInternal(){
+        Bukkit.getPluginManager().registerEvents(this, SSPAPI.getPlugin());
+    } 
+    public abstract void initInstanceStarter();
+    public abstract Instance newInstance();
+    public abstract Instance newInstanceAndStart(); 
+    
 }

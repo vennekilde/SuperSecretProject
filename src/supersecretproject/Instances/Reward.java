@@ -30,6 +30,7 @@ package supersecretproject.Instances;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class Reward {
-
+public interface Reward {
+    public void giveReward();
+    public String getStringReward();
 }

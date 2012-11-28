@@ -1,6 +1,5 @@
 package supersecretproject;
 
-import SSP.SuperSecretProject;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -34,4 +33,11 @@ import SSP.SuperSecretProject;
 
 public class SSPAPI {
     public static SuperSecretProject plugin;
+    public SSPAPI(SuperSecretProject plugin){
+        SSPAPI.plugin = plugin;
+    }
+    
+    public static SuperSecretProject getPlugin(){
+        return plugin;
+    }
 }

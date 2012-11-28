@@ -7,9 +7,7 @@ import net.minecraft.server.NBTTagString;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
  
-//Thanks to nisovin for this
-
-public class NamedItemStack{
+public class NamedItemStack {
     private CraftItemStack                    craftStack;
     private net.minecraft.server.ItemStack    itemStack;
  
@@ -22,52 +20,54 @@ public class NamedItemStack{
             craftStack = new CraftItemStack(item);
             itemStack = craftStack.getHandle();
         }
-        NBTTagCompound tag = itemStack.tag;
+        CraftItemStack cis = ((CraftItemStack)this.craftStack);
+        NBTTagCompound tag = cis.getHandle().getTag();
         if (tag == null) {
-            tag = new NBTTagCompound();
-            tag.setCompound("display", new NBTTagCompound());
-            itemStack.tag = tag;
+            cis.getHandle().setTag(new NBTTagCompound());
         }
     }
+    public NamedItemStack(String name,ItemStack item) {
+        this(item);
+        setName(name);
+    }
  
-    public NamedItemStack setName(String name) {
-        NBTTagCompound tag = itemStack.tag.getCompound("display");
-        tag.setString("Name", name);
-        itemStack.tag.setCompound("display", tag);
-        return this;
+    private boolean hasDisplay() {
+        return ((CraftItemStack)this.craftStack).getHandle().getTag().hasKey("display");
+    }
+ 
+    private NBTTagCompound getDisplay() {
+        return ((CraftItemStack)this.craftStack).getHandle().getTag().getCompound("display");
+    }
+ 
+    private void addDisplay() {
+        ((CraftItemStack)this.craftStack).getHandle().getTag().setCompound("display", new NBTTagCompound());
     }
  
     public String getName() {
-        NBTTagCompound tag = itemStack.tag.getCompound("display");
-        return tag.getString("Name");
+        if (hasDisplay() == false) {
+            return null;
+        }
+        String name = getDisplay().getString("Name");
+        if (name.equals("")) {
+            return null;
+        }
+        return name;
     }
  
-    public NamedItemStack addLore(String lore) {
-        NBTTagCompound tag = itemStack.tag.getCompound("display");
-        NBTTagList list = tag.getList("Lore");
-        if (list == null) {
-            list = new NBTTagList();
+    public NamedItemStack setName(String name) {
+        if (hasDisplay() == false) {
+            this.addDisplay();
         }
-        list.add(new NBTTagString(lore));
-        tag.set("Lore", list);
-        itemStack.tag.setCompound("display", tag);
+        NBTTagCompound display = this.getDisplay();
+        if (name == null) {
+            display.remove("Name");
+        }
+        display.setString("Name", name);
         return this;
     }
  
-    public NamedItemStack setLore(String... lore) {
-        NBTTagCompound tag = itemStack.tag.getCompound("display");
-        NBTTagList list = new NBTTagList();
-        for (String l : lore) {
-            list.add(new NBTTagString(l));
-        }
-        tag.set("Lore", list);
-        itemStack.tag.setCompound("display", tag);
-        return this;
-    }
- 
-    public String[] getLore() {
-        NBTTagCompound tag = itemStack.tag;
-        NBTTagList list = tag.getCompound("display").getList("Lore");
+    public String[] getLoreStrings(){
+        NBTTagList list = getLore();
         ArrayList<String> strings = new ArrayList();
         String[] lores = new String[] {};
         for (int i = 0; i < strings.size(); i++) {
@@ -76,8 +76,65 @@ public class NamedItemStack{
         strings.toArray(lores);
         return lores;
     }
+    
+    public NBTTagList getLore()
+    {
+        if (!hasDisplay())
+        {
+            return new NBTTagList();
+        }
+        NBTTagList lore = getDisplay().getList("Lore");
+        if (lore == null) 
+        {
+            // returns empty list
+            return new NBTTagList();
+        }
+        return lore;
+    }
  
-    public ItemStack getItemStack() {
+    public NamedItemStack setLore(String lore)
+    {
+        if(!hasDisplay())
+        {
+            this.addDisplay();
+        }
+        NBTTagCompound display = this.getDisplay();
+        NBTTagList l = new NBTTagList();
+        // Added multiline lore support
+        // Splits the lines
+        String[] loreLines = lore.split("\n");
+        // Add each line
+        for(String line : loreLines)
+        {
+             l.add(new NBTTagString("", line));
+        }
+        // Set the lore
+        display.set("Lore", l);
+        return this;
+    }
+    
+    public NamedItemStack addLore(String lore){
+        if(hasDisplay() == false){
+            this.addDisplay();
+        }
+        NBTTagCompound display = new NBTTagCompound();
+        NBTTagList l = display.getList("lore");
+        
+        // Added multiline lore support
+        // Splits the lines
+        String[] loreLines = lore.split("\n");
+        // Add each line
+        for(String line : loreLines)
+        {
+             l.add(new NBTTagString("", line));
+        }
+        // Set the lore
+        display.set("Lore", l);
+        return this;
+    }
+    
+    public ItemStack getItemStack(){
         return craftStack;
     }
 }
+

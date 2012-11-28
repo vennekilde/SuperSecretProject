@@ -1,0 +1,12 @@
+name: SuperSecretProject
+version: 1.0
+author: iamdansker
+main: supersecretproject.SuperSecretProject
+website: http://www.jeppes.info
+
+#Commands are registrered by the plugin itself dynamically to make it easier to
+#add commands and for other developers to add commands
+
+#Plugins developed for the ZoneCore should have this in it's plugin.yml file
+
+depend: [ZoneCore]

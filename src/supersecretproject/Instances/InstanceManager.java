@@ -1,9 +1,6 @@
-package supersecretproject;
+package supersecretproject.Instances;
 
-import info.jeppes.ZoneCore.ZoneConfig;
-import info.jeppes.ZoneCore.ZonePlugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import supersecretproject.Util.MSG;
+import java.util.ArrayList;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -35,48 +32,34 @@ import supersecretproject.Util.MSG;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class SuperSecretProject extends ZonePlugin{
-    private Loader loader;
+public class InstanceManager {
+    private static ArrayList<Instance> instances = new ArrayList();
+    private static ArrayList<Instance> activeInstances = new ArrayList();
 
-    @Override
-    public String[] preLoadConfig() {
-        return null;
+    public static ArrayList<Instance> getInstances() {
+        return instances;
     }
-
-    @Override
-    public void loadDefaultConfig(ZoneConfig config) {
+    public static void setInstances(ArrayList<Instance> instances) {
+        InstanceManager.instances = instances;
+        for(Instance instance : instances){
+            instance.initInstanceStarterInternal();
+        }
     }
-
-    @Override
-    public void loadConfig(ZoneConfig config) {
+    public static void addInstance(Instance instance){
+        instances.add(instance);
+        instance.initInstanceStarterInternal();
     }
-
-    @Override
-    public SSPAPI initAPI() {
-        SSPAPI API = new SSPAPI(this);
-        MSG msg = new MSG(); //init
-        return API;
-    }
-
-    @Override
-    public SSPAPI getAPI() {
-        return (SSPAPI)this.getObjectAPI();
-    }
-
-    @Override
-    public String[] initCommandAliases() {
-        return null;
-    }
-
-    @Override
-    public String initCommandPackageDirectory() {
-        return null;
+    public static void removeInstance(Instance instance){
+        instances.remove(instance);
     }
     
-    @Override
-    public void onEnable(){
-        super.onEnable();
-        loader = new Loader();
-        loader.load();
+    public static ArrayList<Instance> getActiveInstances() {
+        return activeInstances;
+    }
+    public static void addActiveInstance(Instance instance){
+        activeInstances.add(instance);
+    }
+    public static void removeActiveInstance(Instance instance){
+        activeInstances.remove(instance);
     }
 }

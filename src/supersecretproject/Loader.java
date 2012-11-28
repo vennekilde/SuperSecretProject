@@ -1,15 +1,26 @@
 package supersecretproject;
 
+import info.jeppes.ZoneCore.Commands.ZoneCommand;
+import info.jeppes.ZoneCore.Commands.ZoneCommandManager;
+import info.jeppes.ZoneCore.ZoneCore;
+import info.jeppes.ZoneCore.ZonePlugin;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import supersecretproject.Instances.Instance;
+import supersecretproject.Instances.InstanceManager;
+import supersecretproject.Quests.Quest;
+import supersecretproject.Skills.Magic.Skill;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -42,95 +53,155 @@ import supersecretproject.Instances.Instance;
  */
 
 public class Loader {
+    public static String instancesClassDirectory = Instance.class.getPackage().getName()+".HardcodedInstances";
+    public static String questsClassDirectory = Quest.class.getPackage().getName()+".HardcodedQuests";
+    public static String skillsClassDirectory = Skill.class.getPackage().getName()+".HardcodeSkills";
     
-    
-    
-    public static void load(){
-        
+    public void load(){
+        loadSkills();
+        loadInstances();
+        loadQuests();
     }
-    
-    private ArrayList<Instance> instances = new ArrayList();
     public void loadInstances(){
-        instances.clear();
+        //Load isntances from directory
+        String instancesDirectory = SSPAPI.getPlugin().getZoneCore().getPluginDirectory()+File.separator+"instances";
+        ArrayList<Object> javaObjectsFromDirectory = getJavaObjectsFromDirectory(instancesDirectory);
+        
+        ArrayList<Instance> instances = new ArrayList();
+        for(Object obj : javaObjectsFromDirectory){
+            if(obj instanceof Instance){
+                Instance instance = (Instance)obj;
+                instance.loadStagesFromClassFiles(instancesDirectory);
+                instances.add(instance);
+            }
+        }
+        
+        //Load hardcoded instances
+        Class[] classesInPackage = null;
+        classesInPackage = SSPAPI.getPlugin().getClassesInPackage(instancesClassDirectory,null);
+        for(Class commandClass : classesInPackage){
+            try {
+                Object obj = commandClass.newInstance();
+                if(obj instanceof Instance){
+                    Instance instance = (Instance)obj;
+                    instance.loadStagesFromPackage();
+                    instances.add(instance);
+                }
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ZonePlugin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        InstanceManager.setInstances(instances);
     }
-    /**
-    * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
-    * Adapted from http://snippets.dzone.com/posts/show/4831 and extended to support use of JAR files
-    *
-    * @param packageName The base package
-    * @param regexFilter an optional class name pattern.
-    * @return The classes
-    */
-   public Class[] getClassesInPackage(String packageName, String regexFilter) {
-           Pattern regex = null;
-           if (regexFilter != null)
-                   regex = Pattern.compile(regexFilter);
+    
+    
+    ////////////////////////////////////
+    //NEED MORE CODE FOR QUEST MANAGER//
+    ////////////////////////////////////
+    public void loadQuests(){
+        //Load quests from directory
+        String instancesDirectory = SSPAPI.getPlugin().getZoneCore().getPluginDirectory()+File.separator+"quests";
+        ArrayList<Object> javaObjectsFromDirectory = getJavaObjectsFromDirectory(instancesDirectory);
+        
+        ArrayList<Instance> quests = new ArrayList();
+        for(Object obj : javaObjectsFromDirectory){
+            if(obj instanceof Quest){
+                quests.add((Instance)obj);
+            }
+        }
+        
+        //Load hardcoded quests
+        Class[] classesInPackage = null;
+        classesInPackage = SSPAPI.getPlugin().getClassesInPackage(questsClassDirectory,null);
+        for(Class commandClass : classesInPackage){
+            try {
+                Object obj = commandClass.newInstance();
+                if(obj instanceof Quest){
+                    quests.add((Instance) obj);
+                }
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ZonePlugin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    
+    /////////////////////////////////////
+    //NEED MORE CODE FOR SKILLS MANAGER//
+    /////////////////////////////////////
+    public void loadSkills(){
+        //Load quests from directory
+        String instancesDirectory = SSPAPI.getPlugin().getZoneCore().getPluginDirectory()+File.separator+"skills";
+        ArrayList<Object> javaObjectsFromDirectory = getJavaObjectsFromDirectory(instancesDirectory);
+        
+        ArrayList<Instance> skills = new ArrayList();
+        for(Object obj : javaObjectsFromDirectory){
+            if(obj instanceof Quest){
+                skills.add((Instance)obj);
+            }
+        }
+        
+        //Load hardcoded quests
+        Class[] classesInPackage = null;
+        classesInPackage = SSPAPI.getPlugin().getClassesInPackage(skillsClassDirectory,null);
+        for(Class commandClass : classesInPackage){
+            try {
+                Object obj = commandClass.newInstance();
+                if(obj instanceof Quest){
+                    skills.add((Instance) obj);
+                }
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ZonePlugin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    
+    public static ArrayList<Object> getJavaObjectsFromDirectory(String directoryPath){
+        ArrayList<Object> objectsInDirectory = new ArrayList();
+        File directory = new File(directoryPath);
+        if(directory != null){
+            if(directory.isDirectory()){
+                ArrayList<String> commandClassFiles = getFilesFromDirectoryAndSubDirectories(directory,new ArrayList<String>(),"");
+        
+                ClassLoader loader = null;
+                try {
+                    URL url = directory.toURI().toURL(); 
+                    URL[] urls = new URL[]{url};
 
-           try {
-                   ClassLoader classLoader = this.getClassLoader();
-                   assert classLoader != null;
-                   String path = packageName.replace('.', '/');
-                   Enumeration<URL> resources = classLoader.getResources(path);
-                   List<String> dirs = new ArrayList<>();
-                   while (resources.hasMoreElements()) {
-                           URL resource = resources.nextElement();
-                           dirs.add(resource.getFile());
-                   }
-                   TreeSet<String> classes = new TreeSet<>();
-                   for (String directory : dirs) {
-                           classes.addAll(findClasses(directory, packageName, regex));
-                   }
-                   ArrayList<Class> classList = new ArrayList<>();
-                   for (String clazz : classes) {
-                           classList.add(Class.forName(clazz));
-                   }
-                   return classList.toArray(new Class[classes.size()]);
-           } catch (Exception e) {
-                   e.printStackTrace();
-                   return null;
-           }
-   }
+                    loader = new URLClassLoader(urls);
 
-   /**
-    * Recursive method used to find all classes in a given path (directory or zip file url).  Directories
-    * are searched recursively.  (zip files are
-    * Adapted from http://snippets.dzone.com/posts/show/4831 and extended to support use of JAR files
-    *
-    * @param path   The base directory or url from which to search.
-    * @param packageName The package name for classes found inside the base directory
-    * @param regex       an optional class name pattern.  e.g. .*Test
-    * @return The classes
-    */
-   private TreeSet<String> findClasses(String path, String packageName, Pattern regex) throws Exception {
-       TreeSet<String> classes = new TreeSet<>();
-       if (path.startsWith("file:") && path.contains("!")) {
-           String[] split = path.split("!");
-           URL jar = new URL(split[0]);
-           ZipInputStream zip = new ZipInputStream(jar.openStream());
-           ZipEntry entry;
-           while ((entry = zip.getNextEntry()) != null) {
-               if (entry.getName().endsWith(".class")) {
-                   String className = entry.getName().replaceAll("[$].*", "").replaceAll("[.]class", "").replace('/', '.');
-                   if (className.startsWith(packageName) && (regex == null || regex.matcher(className).matches()))
-                       classes.add(className);
-               }
-           }
-       }
-       File dir = new File(path);
-       if (!dir.exists()) {
-           return classes;
-       }
-       File[] files = dir.listFiles();
-       for (File file : files) {
-           if (file.isDirectory()) {
-               assert !file.getName().contains(".");
-               classes.addAll(findClasses(file.getAbsolutePath(), packageName + "." + file.getName(), regex));
-           } else if (file.getName().endsWith(".class")) {
-               String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
-               if (regex == null || regex.matcher(className).matches())
-                       classes.add(className);
-           }
-       }
-       return classes;
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                for(String classPackageAndName : commandClassFiles){
+                    try {
+                        Class commandClass = loader.loadClass(classPackageAndName);
+                        objectsInDirectory.add(commandClass.newInstance());
+                    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+                        Logger.getLogger(Loader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return objectsInDirectory;
+    }
+    public static ArrayList<String> getFilesFromDirectoryAndSubDirectories(File aFile, ArrayList<String> files, String startPath) {
+        if(aFile.isFile()){
+            String fileName = aFile.getName();
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+            files.add(startPath + "." + fileName);
+        } else if (aFile.isDirectory()) {
+            File[] listOfFiles = aFile.listFiles();
+            if(listOfFiles!=null) {
+                for (File file : listOfFiles) {
+                    files = getFilesFromDirectoryAndSubDirectories(file,files,startPath + "." + file.getName());
+                }
+            } else {
+                Logger.getLogger(ZonePlugin.class.getName()).log(Level.SEVERE, null, "FILE ACCESS DENIED");
+            }
+        }
+        return files;
     }
 }

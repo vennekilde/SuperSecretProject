@@ -1,9 +1,4 @@
-package supersecretproject;
-
-import info.jeppes.ZoneCore.ZoneConfig;
-import info.jeppes.ZoneCore.ZonePlugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import supersecretproject.Util.MSG;
+package supersecretproject.Quests;
 
 /*
  * Author: Jeppe Boysen Vennekilde
@@ -35,48 +30,6 @@ import supersecretproject.Util.MSG;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class SuperSecretProject extends ZonePlugin{
-    private Loader loader;
+public class Quest {
 
-    @Override
-    public String[] preLoadConfig() {
-        return null;
-    }
-
-    @Override
-    public void loadDefaultConfig(ZoneConfig config) {
-    }
-
-    @Override
-    public void loadConfig(ZoneConfig config) {
-    }
-
-    @Override
-    public SSPAPI initAPI() {
-        SSPAPI API = new SSPAPI(this);
-        MSG msg = new MSG(); //init
-        return API;
-    }
-
-    @Override
-    public SSPAPI getAPI() {
-        return (SSPAPI)this.getObjectAPI();
-    }
-
-    @Override
-    public String[] initCommandAliases() {
-        return null;
-    }
-
-    @Override
-    public String initCommandPackageDirectory() {
-        return null;
-    }
-    
-    @Override
-    public void onEnable(){
-        super.onEnable();
-        loader = new Loader();
-        loader.load();
-    }
 }
