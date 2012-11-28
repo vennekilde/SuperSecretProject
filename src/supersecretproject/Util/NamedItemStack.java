@@ -17,8 +17,7 @@ public class NamedItemStack {
         if (item instanceof CraftItemStack) {
             craftStack = (CraftItemStack) item;
             itemStack = craftStack.getHandle();
-        }
-        else if (item instanceof ItemStack) {
+        } else if (item instanceof ItemStack) {
             craftStack = new CraftItemStack(item);
             itemStack = craftStack.getHandle();
         }
@@ -33,15 +32,15 @@ public class NamedItemStack {
     }
  
     private boolean hasDisplay() {
-        return ((CraftItemStack)this.craftStack).getHandle().getTag().hasKey("display");
+        return itemStack.getTag().hasKey("display");
     }
  
     private NBTTagCompound getDisplay() {
-        return ((CraftItemStack)this.craftStack).getHandle().getTag().getCompound("display");
+        return itemStack.getTag().getCompound("display");
     }
  
     private void addDisplay() {
-        ((CraftItemStack)this.craftStack).getHandle().getTag().setCompound("display", new NBTTagCompound());
+        itemStack.getTag().setCompound("display", new NBTTagCompound());
     }
  
     public String getName() {
