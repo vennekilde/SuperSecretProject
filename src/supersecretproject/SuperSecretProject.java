@@ -2,7 +2,6 @@ package supersecretproject;
 
 import info.jeppes.ZoneCore.ZoneConfig;
 import info.jeppes.ZoneCore.ZonePlugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import supersecretproject.Util.MSG;
 
 public class SuperSecretProject extends ZonePlugin{
