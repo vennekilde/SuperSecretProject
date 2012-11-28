@@ -8,7 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
  
-public class NamedItemStack {
+public class NamedItemStack implements Cloneable{
  
     private CraftItemStack                    craftStack;
     private net.minecraft.server.ItemStack    itemStack;
@@ -141,6 +141,11 @@ public class NamedItemStack {
     
     public ItemStack getItemStack(){
         return craftStack;
+    }
+    
+    @Override
+    public NamedItemStack clone(){
+        return new NamedItemStack(getItemStack().clone());
     }
 }
 
