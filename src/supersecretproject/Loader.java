@@ -1,22 +1,13 @@
 package supersecretproject;
 
-import info.jeppes.ZoneCore.Commands.ZoneCommand;
-import info.jeppes.ZoneCore.Commands.ZoneCommandManager;
-import info.jeppes.ZoneCore.ZoneCore;
 import info.jeppes.ZoneCore.ZonePlugin;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import supersecretproject.Instances.Instance;
 import supersecretproject.Instances.InstanceManager;
 import supersecretproject.Quests.Quest;
