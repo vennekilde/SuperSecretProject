@@ -2,20 +2,15 @@ package supersecretproject.Instances.HardcodedInstances.TestInstance;
 
 import info.jeppes.ZoneCore.Users.ZoneUser;
 import info.jeppes.ZoneCore.ZoneCore;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import supersecretproject.Instances.Instance;
-import supersecretproject.Instances.InstanceManager;
-import supersecretproject.Instances.Reward;
-import supersecretproject.SSPAPI;
-import supersecretproject.Util.NamedItemStack;
+import supersecretproject.Items.NamedItemStack;
 
 public class TestInstance extends Instance{
     

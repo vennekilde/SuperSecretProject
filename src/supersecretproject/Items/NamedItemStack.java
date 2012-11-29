@@ -1,7 +1,8 @@
-package supersecretproject.Util;
+package supersecretproject.Items;
 
 import java.util.ArrayList;
 import net.minecraft.server.NBTTagCompound;
+import net.minecraft.server.NBTTagInt;
 import net.minecraft.server.NBTTagList;
 import net.minecraft.server.NBTTagString;
 import org.bukkit.ChatColor;
@@ -136,6 +137,58 @@ public class NamedItemStack implements Cloneable{
         }
         // Set the lore
         display.set("Lore", l);
+        return this;
+    }
+    
+    public int getItemColor(){
+        if (!hasDisplay())
+        {
+            return -1;
+        }
+        if (!getDisplay().hasKey("color")) 
+        {
+            // returns empty list
+            return -1;
+        }
+        int colorID = getDisplay().getInt("color");
+        return colorID;
+    }
+    public int[] getItemColorRGB(){
+        int itemColor = getItemColor();
+        if (itemColor < 0) 
+        {
+            // returns empty list
+            return new int[]{-1,-1,-1};
+        }
+        int colorID = getDisplay().getInt("color");
+        
+        int red = colorID >> 16;
+        int green = (colorID - (red << 16) >> 8);
+        int blue = colorID - (red << 16) - (green << 8);
+        
+        return new int[]{red,green,blue};
+    }
+    
+    public NamedItemStack setItemColor(int red, int green, int blue){     
+        if (!hasDisplay())
+        {
+            this.addDisplay();
+        }
+        
+        NBTTagCompound display = this.getDisplay();
+        if(red < 0 || green < 0 || blue < 0){
+            display.remove("color");
+            return this;
+        }
+        
+        red = red > 255 ? 255 : red;
+        green = green > 255 ? 255 : green;
+        blue = blue > 255 ? 255 : blue;
+        
+        int colorId = (red << 16) + (green << 8) + blue;
+        NBTTagInt colorTag = new NBTTagInt("",colorId);
+        display.set("color", colorTag);
+        
         return this;
     }
     

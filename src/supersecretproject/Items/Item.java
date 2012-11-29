@@ -6,7 +6,6 @@
 package supersecretproject.Items;
 
 import org.bukkit.inventory.ItemStack;
-import supersecretproject.Util.NamedItemStack;
 
 public class Item implements Cloneable{
     private NamedItemStack namedItemStack;
