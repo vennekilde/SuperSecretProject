@@ -1,7 +1,6 @@
 package supersecretproject.Util;
 
 import info.jeppes.ZoneCore.ZoneConfig;
-import info.jeppes.ZoneCore.ZoneCore;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,8 +11,9 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import supersecretproject.SSPAPI;
-import supersecretproject.SuperSecretProject;
 
 public class MSG {
     public static File errorFileLog = null;
@@ -30,6 +30,23 @@ public class MSG {
             }
         }
     }
+    
+    public static void sendMessage(String message){
+        for(Player player : Bukkit.getOnlinePlayers()){
+            player.sendMessage(message);
+        }
+    }
+    public static void sendMessage(Player player, String message){
+        player.sendMessage(message);
+    }
+    public static void sendMessage(Location origin, double radius, String message){
+        for(Player player : Bukkit.getOnlinePlayers()){
+            if(origin.getWorld().equals(player.getWorld()) && origin.distance(player.getLocation()) <= radius){
+                player.sendMessage(message);
+            }
+        }
+    }
+    
     
     public static void outputErrorMessage(String message){
         Bukkit.getLogger().log(Level.WARNING, message);
