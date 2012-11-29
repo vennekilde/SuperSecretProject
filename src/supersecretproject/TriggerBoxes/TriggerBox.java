@@ -1,5 +1,19 @@
 package supersecretproject.TriggerBoxes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import supersecretproject.Events.TriggerBoxEnterEvent;
+import supersecretproject.Events.TriggerBoxLeaveEvent;
+import supersecretproject.SSPAPI;
+
 /*
  * Author: Jeppe Boysen Vennekilde
  *
@@ -30,6 +44,77 @@ package supersecretproject.TriggerBoxes;
  * permission of the OWNER and may be subject to certain terms.
  */
 
-public class TriggerBox {
+public abstract class TriggerBox implements Listener{
+    private boolean triggerByEveryone = true;
+    private boolean useEvents = false;
+    private ArrayList<Entity> triggerEntities = new ArrayList();
+    private ArrayList<Entity> isInside = new ArrayList();
+    
+    public TriggerBox(){
+        Bukkit.getPluginManager().registerEvents(this, SSPAPI.getPlugin());
+    }
+    
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerMove(PlayerMoveEvent event){
+        Player player = event.getPlayer();
+        if(triggerByEveryone || triggerEntities.contains(player)){
+            if(isInside(player.getLocation())){
+                //An entity entered the trigger box
+                //make sure the event is only called once
+                if(!isInside.contains(player)){
+                    isInside.add(player);
+                    entered(player);
+                    if(useEvents){
+                        TriggerBoxEnterEvent triggerBoxEnterEvent = new TriggerBoxEnterEvent(player);
+                        Bukkit.getPluginManager().callEvent(triggerBoxEnterEvent);
+                    }
+                }
+            } else {
+                //An entity left the trigger box
+                //make sure the event is only called once
+                if(isInside.contains(player)){
+                    isInside.remove(player);
+                    left(player);
+                    if(useEvents){
+                        TriggerBoxLeaveEvent triggerBoxEnterEvent = new TriggerBoxLeaveEvent(player);
+                        Bukkit.getPluginManager().callEvent(triggerBoxEnterEvent);
+                    }
+                }
+            }
+        }
+    }
+    public abstract boolean isInside(Location location);
+    public abstract void entered(Entity entity);
+    public abstract void left(Entity entity);
 
+    public boolean isTriggerByEveryone() {
+        return triggerByEveryone;
+    }
+    public void setTriggerByEveryone(boolean triggerByEveryone) {
+        this.triggerByEveryone = triggerByEveryone;
+    }
+
+    public ArrayList<Entity> getTriggerEntities() {
+        return triggerEntities;
+    }
+    /**
+     * set which entities that will trigger the box
+     * NOTE that only players are supported at this time
+     * @param entities
+     */
+    public void setTriggerEntities(ArrayList<Entity> entities) {
+        this.triggerEntities = entities;
+    }
+    /**
+     * Add an entity to that will trigger the box
+     * NOTE that only players are supported at this time
+     * @param entity
+     */
+    public void addTriggerEntity(Entity entity){
+        triggerEntities.add(entity);
+    }
+    
+    public void removeTriggerEntity(Entity entity){
+        triggerEntities.remove(entity);
+    }
 }

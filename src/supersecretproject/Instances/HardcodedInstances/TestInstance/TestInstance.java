@@ -38,14 +38,28 @@ public class TestInstance extends Instance{
             player.sendMessage("Here is your reward!");
         }
         //.addLore("Used by some of the best warriors")
-        NamedItemStack namedItemStack = new NamedItemStack(ChatColor.DARK_PURPLE+"The Mighty Sword",new ItemStack(Material .DIAMOND_SWORD));
-        ItemStack itemStack = namedItemStack.getItemStack();
+        NamedItemStack mightySword = new NamedItemStack(ChatColor.DARK_PURPLE+"The Mighty Sword",new ItemStack(Material .DIAMOND_SWORD));
+        ItemStack itemStack = mightySword.getItemStack();
         itemStack.addEnchantment(Enchantment.DAMAGE_ALL, 5);
-        namedItemStack.setItemColor(255, 0, 0);
-        namedItemStack.setLore("test This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
+        mightySword.setItemColor(255, 0, 0);
+        mightySword.setLore("test This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
+        
+        
+        NamedItemStack helmet = new NamedItemStack(ChatColor.RED+"Vision of Hatred",new ItemStack(Material.LEATHER_HELMET));
+        helmet.setItemColor(255, 0, 0);
+        NamedItemStack armor = new NamedItemStack(ChatColor.RED+"Hells Flame",new ItemStack(Material.LEATHER_CHESTPLATE));
+        armor.setItemColor(255, 0, 0);
+        NamedItemStack leggings = new NamedItemStack(ChatColor.RED+"Nether Waders",new ItemStack(Material.LEATHER_LEGGINGS));
+        leggings.setItemColor(255, 0, 0);
+        NamedItemStack boots = new NamedItemStack(ChatColor.RED+"Walking Fire",new ItemStack(Material.LEATHER_BOOTS));
+        boots.setItemColor(255, 0, 0);
         
         for(ZoneUser player : getPlayers()){
             player.getInventory().addItem(itemStack.clone());
+            player.getInventory().addItem(helmet.getItemStack().clone());
+            player.getInventory().addItem(armor.getItemStack().clone());
+            player.getInventory().addItem(leggings.getItemStack().clone());
+            player.getInventory().addItem(boots.getItemStack().clone());
         }
     }
 
