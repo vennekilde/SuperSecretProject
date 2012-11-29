@@ -1,13 +1,18 @@
 package supersecretproject.Items;
 
 import java.util.HashMap;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
-/*
- * This is a temporary item manager until the plugin API update is out so
- * item customization can be done without the use of a manager and custom
- * items can be created.
- */
-
-public class ItemManager {
-    private HashMap<String,Item> items = new HashMap();
+public class ItemManager implements Listener{
+    
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onEntityDamage(EntityDamageEvent event) {
+        if(event instanceof EntityDamageByEntityEvent){
+            EntityDamageByEntityEvent e = (EntityDamageByEntityEvent)event;
+        }
+    }
 }
