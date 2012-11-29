@@ -41,7 +41,8 @@ public class TestInstance extends Instance{
         NamedItemStack namedItemStack = new NamedItemStack(ChatColor.DARK_PURPLE+"The Mighty Sword",new ItemStack(Material .DIAMOND_SWORD));
         ItemStack itemStack = namedItemStack.getItemStack();
         itemStack.addEnchantment(Enchantment.DAMAGE_ALL, 5);
-        namedItemStack.setLore("This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
+        namedItemStack.setItemColor(255, 0, 0);
+        namedItemStack.setLore("test This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
         
         for(ZoneUser player : getPlayers()){
             player.getInventory().addItem(itemStack.clone());

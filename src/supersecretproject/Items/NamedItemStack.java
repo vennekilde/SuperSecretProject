@@ -169,7 +169,7 @@ public class NamedItemStack implements Cloneable{
         return new int[]{red,green,blue};
     }
     
-    public NamedItemStack setItemColor(int red, int green, int blue){     
+    public NamedItemStack setItemColor(int red, int green, int blue){    
         if (!hasDisplay())
         {
             this.addDisplay();
@@ -188,7 +188,6 @@ public class NamedItemStack implements Cloneable{
         int colorId = (red << 16) + (green << 8) + blue;
         NBTTagInt colorTag = new NBTTagInt("",colorId);
         display.set("color", colorTag);
-        
         return this;
     }
     
