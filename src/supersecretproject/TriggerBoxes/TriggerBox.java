@@ -1,15 +1,18 @@
 package supersecretproject.TriggerBoxes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import supersecretproject.Events.TriggerBoxEnterEvent;
 import supersecretproject.Events.TriggerBoxLeaveEvent;
 import supersecretproject.SSPAPI;
@@ -49,34 +52,63 @@ public abstract class TriggerBox implements Listener{
     private boolean useEvents = false;
     private ArrayList<Entity> triggerEntities = new ArrayList();
     private ArrayList<Entity> isInside = new ArrayList();
+    private World world;
     
-    public TriggerBox(){
+    public TriggerBox(World world){
+        this.world = world;
         Bukkit.getPluginManager().registerEvents(this, SSPAPI.getPlugin());
     }
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent event){
-        Player player = event.getPlayer();
-        if(triggerByEveryone || triggerEntities.contains(player)){
-            if(isInside(player.getLocation())){
+        updateEntity(event.getPlayer(),event.getTo());
+    }
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerTeleport(PlayerTeleportEvent event){
+        updateEntity(event.getPlayer(),event.getTo());
+    }
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerLogin(PlayerLoginEvent event){
+        updateEntity(event.getPlayer(),event.getPlayer().getLocation());
+    }
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerQuit(PlayerQuitEvent event){
+        updateEntity(event.getPlayer(), null);
+    }
+    
+    public void updateEntity(Entity entity, Location newLocation){
+        //Is null if the entity left the world or server
+        if(newLocation == null){
+            if(isInside.contains(entity)){
+                isInside.remove(entity);
+                left(entity);
+                if(useEvents){
+                    TriggerBoxLeaveEvent triggerBoxEnterEvent = new TriggerBoxLeaveEvent(entity);
+                    Bukkit.getPluginManager().callEvent(triggerBoxEnterEvent);
+                }
+            }
+        }
+        //check to see if the entity entered or left the box
+        if(triggerByEveryone || triggerEntities.contains(entity)){
+            if(isInside(entity.getLocation())){
                 //An entity entered the trigger box
                 //make sure the event is only called once
-                if(!isInside.contains(player)){
-                    isInside.add(player);
-                    entered(player);
+                if(!isInside.contains(entity)){
+                    isInside.add(entity);
+                    entered(entity);
                     if(useEvents){
-                        TriggerBoxEnterEvent triggerBoxEnterEvent = new TriggerBoxEnterEvent(player);
+                        TriggerBoxEnterEvent triggerBoxEnterEvent = new TriggerBoxEnterEvent(entity);
                         Bukkit.getPluginManager().callEvent(triggerBoxEnterEvent);
                     }
                 }
             } else {
                 //An entity left the trigger box
                 //make sure the event is only called once
-                if(isInside.contains(player)){
-                    isInside.remove(player);
-                    left(player);
+                if(isInside.contains(entity)){
+                    isInside.remove(entity);
+                    left(entity);
                     if(useEvents){
-                        TriggerBoxLeaveEvent triggerBoxEnterEvent = new TriggerBoxLeaveEvent(player);
+                        TriggerBoxLeaveEvent triggerBoxEnterEvent = new TriggerBoxLeaveEvent(entity);
                         Bukkit.getPluginManager().callEvent(triggerBoxEnterEvent);
                     }
                 }
@@ -117,4 +149,33 @@ public abstract class TriggerBox implements Listener{
     public void removeTriggerEntity(Entity entity){
         triggerEntities.remove(entity);
     }
+    
+    public void messagePlayersInside(String message){
+        for(Entity entity : isInside){
+            if(entity instanceof Player){
+                Player player = (Player)entity;
+                player.sendMessage(message);
+            }
+        }
+    }
+
+    public boolean isUsingEvents() {
+        return useEvents;
+    }
+    public void setUseEvents(boolean useEvents) {
+        this.useEvents = useEvents;
+    }
+    
+    public ArrayList<Entity> getEntitiesInside() {
+        return isInside;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+    public void setWorld(World world) {
+        this.world = world;
+    }
+    
+    
 }

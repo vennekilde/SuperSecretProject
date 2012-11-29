@@ -38,14 +38,13 @@ import org.bukkit.World;
 public abstract class PolygonTriggerBox extends TriggerBox{
 
     private ArrayList<Point2D> polygon;
-    private World world;
     private double minY;
     private double maxY;
     
     public PolygonTriggerBox(ArrayList<Location> polygon) throws Exception{
-        world = polygon.get(0).getWorld();
+        super(polygon.get(0).getWorld());
         for(Location location : polygon){
-            if(!location.getWorld().equals(world)){
+            if(!location.getWorld().equals(getWorld())){
                 throw new Exception("Some locations are not in the same world");
             } else{
                 this.polygon.add(new PrecisePoint(location.getX(), location.getBlockZ()));
@@ -55,6 +54,7 @@ public abstract class PolygonTriggerBox extends TriggerBox{
         }
     }
     public PolygonTriggerBox(ArrayList<Location> polygon, double minY, double maxY) throws Exception{
+        super(polygon.get(0).getWorld());
         if(minY > maxY){
             double tempMinY = minY;
             this.minY = maxY;
@@ -63,9 +63,8 @@ public abstract class PolygonTriggerBox extends TriggerBox{
             this.minY = minY;
             this.maxY = maxY;
         }
-        world = polygon.get(0).getWorld();
         for(Location location : polygon){
-            if(!location.getWorld().equals(world)){
+            if(!location.getWorld().equals(getWorld())){
                 throw new Exception("Some locations are not in the same world");
             } else{
                 this.polygon.add(new PrecisePoint(location.getX(), location.getBlockZ()));
@@ -73,8 +72,8 @@ public abstract class PolygonTriggerBox extends TriggerBox{
         }
     }
     public PolygonTriggerBox(ArrayList<Point2D> polygon, World world, double minY, double maxY) throws Exception{
+        super(world);
         this.polygon = polygon;
-        this.world = world;
         if(minY > maxY){
             double tempMinY = minY;
             this.minY = maxY;
@@ -87,7 +86,8 @@ public abstract class PolygonTriggerBox extends TriggerBox{
     
     @Override
     public boolean isInside(Location location) {
-        if(location.getY() < minY || maxY < location.getY()){
+        //fast and easy check to see if the location is inside the box
+        if(location.getY() < minY || maxY < location.getY() || location.getWorld().equals(getWorld())){
             return false;
         }
         int i;
