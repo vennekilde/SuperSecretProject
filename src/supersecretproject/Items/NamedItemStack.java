@@ -3,7 +3,6 @@ package supersecretproject.Items;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
 import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagInt;
 import net.minecraft.server.NBTTagList;
@@ -86,6 +85,7 @@ public class NamedItemStack implements Cloneable{
     }
     public void removeStat(String stat){
         itemStats.remove(stat);
+        
         updateLoreAndStats();
     }
     public HashMap<String,String> getStats(){
@@ -249,11 +249,14 @@ public class NamedItemStack implements Cloneable{
             this.addDisplay();
         }
         NBTTagCompound display = this.getDisplay();
+        NBTTagList NBTStatslist = new NBTTagList();
         NBTTagList l = new NBTTagList();
         // Add each stat line
         for(String statName : itemStats.keySet())
         {
              l.add(new NBTTagString("", itemStatsStartColor + statName + ": " + itemStats.get(statName)));
+             //add stats to a seperate NBT tag for easy access
+             NBTStatslist.add(new NBTTagString(statName, itemStats.get(statName)));
         }
         // Add each lore line
         for(String loreLine : itemLore)
@@ -262,6 +265,7 @@ public class NamedItemStack implements Cloneable{
         }
         // Set the stats & lore
         display.set("Lore", l);
+        itemStack.getTag().set("Stats", NBTStatslist);
     }
     
     public ItemStack getItemStack(){
