@@ -11,6 +11,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import supersecretproject.Instances.Instance;
 import supersecretproject.Items.NamedItemStack;
+import supersecretproject.Items.Weapon;
 
 public class TestInstance extends Instance{
     
@@ -38,11 +39,11 @@ public class TestInstance extends Instance{
             player.sendMessage("Here is your reward!");
         }
         //.addLore("Used by some of the best warriors")
-        NamedItemStack mightySword = new NamedItemStack(ChatColor.DARK_PURPLE+"The Mighty Sword",new ItemStack(Material .DIAMOND_SWORD));
-        ItemStack itemStack = mightySword.getItemStack();
-        itemStack.addEnchantment(Enchantment.DAMAGE_ALL, 5);
-        mightySword.setItemColor(255, 0, 0);
-        mightySword.setLore("test This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
+        Weapon mightySword = new Weapon(new ItemStack(Material .DIAMOND_SWORD));
+        mightySword.setName(ChatColor.DARK_PURPLE+"The Mighty Sword");
+        mightySword.setDamagePerHit(15, 22);
+//        mightySword.setItemColor(255, 0, 0);
+        mightySword.setLore("This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
         
         
         NamedItemStack helmet = new NamedItemStack(ChatColor.RED+"Vision of Hatred",new ItemStack(Material.LEATHER_HELMET));
@@ -54,12 +55,19 @@ public class TestInstance extends Instance{
         NamedItemStack boots = new NamedItemStack(ChatColor.RED+"Walking Fire",new ItemStack(Material.LEATHER_BOOTS));
         boots.setItemColor(255, 0, 0);
         
+        Weapon bestBowEver = new Weapon(new ItemStack(Material.BOW));
+        bestBowEver.setName("Herobrines Siege Bow");
+        bestBowEver.setLore("One hit kill...");
+        bestBowEver.setDamagePerHit(100,200);
+        
+        
         for(ZoneUser player : getPlayers()){
-            player.getInventory().addItem(itemStack.clone());
+            player.getInventory().addItem(mightySword.getItemStack().clone());
             player.getInventory().addItem(helmet.getItemStack().clone());
             player.getInventory().addItem(armor.getItemStack().clone());
             player.getInventory().addItem(leggings.getItemStack().clone());
             player.getInventory().addItem(boots.getItemStack().clone());
+            player.getInventory().addItem(bestBowEver.getItemStack().clone());
         }
     }
 
