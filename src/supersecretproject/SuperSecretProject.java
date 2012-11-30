@@ -2,10 +2,13 @@ package supersecretproject;
 
 import info.jeppes.ZoneCore.ZoneConfig;
 import info.jeppes.ZoneCore.ZonePlugin;
+import supersecretproject.Items.ItemManager;
 import supersecretproject.Util.MSG;
 
 public class SuperSecretProject extends ZonePlugin{
     private Loader loader;
+    private ItemManager itemManager = null;
+    private MSG msg = null;
 
     @Override
     public String[] preLoadConfig() {
@@ -23,7 +26,6 @@ public class SuperSecretProject extends ZonePlugin{
     @Override
     public SSPAPI initAPI() {
         SSPAPI API = new SSPAPI(this);
-        MSG msg = new MSG(); //init
         return API;
     }
 
@@ -45,6 +47,9 @@ public class SuperSecretProject extends ZonePlugin{
     @Override
     public void onEnable(){
         super.onEnable();
+        msg = new MSG();
+        itemManager = new ItemManager();
+        
         loader = new Loader();
         loader.load();
     }

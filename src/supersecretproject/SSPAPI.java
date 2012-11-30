@@ -1,7 +1,7 @@
 package supersecretproject;
 
 public class SSPAPI {
-    public static SuperSecretProject plugin;
+    private static SuperSecretProject plugin;
     public SSPAPI(SuperSecretProject plugin){
         SSPAPI.plugin = plugin;
     }
