@@ -3,20 +3,24 @@ package supersecretproject.Items;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import net.minecraft.server.NBTBase;
 import net.minecraft.server.NBTTagCompound;
+import net.minecraft.server.NBTTagDouble;
 import net.minecraft.server.NBTTagInt;
 import net.minecraft.server.NBTTagList;
 import net.minecraft.server.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
+import supersecretproject.Exceptions.StatNotfoundExcpetion;
+import supersecretproject.Util.NBTTagUtil;
  
 public class NamedItemStack implements Cloneable{
  
     private CraftItemStack                      craftStack;
     private net.minecraft.server.ItemStack      itemStack;
     
-    private HashMap<String,String>              itemStats;
+    private HashMap<String,String>              itemDisplayStats;
     private ArrayList<String>                   itemLore;
     private ChatColor                           itemStatsStartColor;
     private ChatColor                           itemLoreStartColor;
@@ -35,64 +39,115 @@ public class NamedItemStack implements Cloneable{
             craftStack.getHandle().setTag(new NBTTagCompound());
         }
         
-        itemStats = new HashMap();
+        itemDisplayStats = new HashMap();
         itemLore = new ArrayList();
         itemStatsStartColor = ChatColor.GOLD;
         itemLoreStartColor = ChatColor.GRAY;
+        //load already added lore
+        NBTTagList savedLore = getTag().getList("Lore");
+        for(int i = 0; i < savedLore.size(); i++){
+            itemLore.add(((NBTTagString)savedLore.get(i)).data);
+        }
+        //load already added stats
+        NBTTagList savedStats = getTag().getList("Stats");
+        for(int i = 0; i < savedStats.size(); i++){
+            itemDisplayStats.put(savedStats.get(i).getName(), ((NBTTagString)savedStats.get(i)).data);
+        }
     }
     public NamedItemStack(String name,ItemStack item) {
         this(item);
         setName(name);
     }
+    
+    private NBTTagCompound getTag() {
+        return NBTTagUtil.getTag(craftStack);
+    }
  
     private boolean hasDisplay() {
-        return itemStack.getTag().hasKey("display");
+        return NBTTagUtil.hasDisplay(craftStack);
     }
- 
     private NBTTagCompound getDisplay() {
-        return itemStack.getTag().getCompound("display");
+        return NBTTagUtil.getDisplay(craftStack);
+    }
+    private void addDisplay() {
+        NBTTagUtil.addDisplay(craftStack);
     }
  
-    private void addDisplay() {
-        itemStack.getTag().setCompound("display", new NBTTagCompound());
+    private boolean hasStats() {
+        return itemStack.getTag().hasKey("Stats");
+    }
+    private NBTTagCompound getStats() {
+        return getTag().getCompound("Stats");
+    }
+    private void addStats() {
+        getTag().set("Stats", new NBTTagList());
     }
  
     public String getName() {
-        if (hasDisplay() == false) {
-            return null;
-        }
-        String name = getDisplay().getString("Name");
-        if (name.equals("")) {
-            return null;
-        }
-        return name;
+        return NBTTagUtil.getName(craftStack);
     }
  
     public NamedItemStack setName(String name) {
-        if (hasDisplay() == false) {
-            this.addDisplay();
-        }
-        NBTTagCompound display = this.getDisplay();
-        if (name == null) {
-            display.remove("Name");
-        }
-        display.setString("Name", name);
+        NBTTagUtil.setName(craftStack, name);
         return this;
     }
-    public void setStat(String stat, String statValue){
-        itemStats.put(stat, statValue);
-        updateLoreAndStats();
+    public void setStat(String stat, double statValue){
+        if(!hasStats()){
+            addStats();
+        }
+        NBTTagDouble nbtStat;
+        try {
+            nbtStat = getNBTStat(stat);
+            nbtStat.data = statValue;
+        } catch (StatNotfoundExcpetion ex) {
+            NBTTagList list = itemStack.getTag().getList("Stats");
+            nbtStat = new NBTTagDouble(stat,statValue);
+            list.add(nbtStat);
+        }
+        
     }
     public void removeStat(String stat){
-        itemStats.remove(stat);
-        
+        if(!hasStats()){
+            return;
+        }
+        NBTTagList list = itemStack.getTag().getList("Stats");
+        NBTTagList newList = new NBTTagList();
+        for(int i = 0; i < list.size(); i++){
+            if(!newList.get(i).getName().equals(stat)){
+                newList.add(list.get(i));
+            }
+        }
+        itemStack.getTag().set("stat", newList);
+    }
+    public double getStat(String name) throws StatNotfoundExcpetion{
+        return getNBTStat(name).data;
+    }
+    public NBTTagDouble getNBTStat(String name) throws StatNotfoundExcpetion{
+        if(!hasStats()){
+            throw new StatNotfoundExcpetion(name);
+        }
+        NBTTagList list = itemStack.getTag().getList("Stats");
+        for(int i = 0; i < list.size(); i++){
+            NBTBase base = list.get(i);
+            if(base instanceof NBTTagDouble){
+                return ((NBTTagDouble)base);
+            }
+        }
+        throw new StatNotfoundExcpetion(name);
+    }
+    public void setDisplayStat(String stat, String statValue){
+        itemDisplayStats.put(stat, statValue);
         updateLoreAndStats();
     }
-    public HashMap<String,String> getStats(){
-        return itemStats;
+    public void removeDisplayStat(String stat){
+        itemDisplayStats.remove(stat);
+        updateLoreAndStats();
     }
-    public String getStat(String statName){
-        return itemStats.get(statName);
+    public HashMap<String,String> getDisplayStats(){
+        return itemDisplayStats;
+    }
+    public String getDisplayStat(String statName){
+        return itemDisplayStats.get(statName);
     }
  
     public String[] getLoreStrings(){
@@ -125,7 +180,8 @@ public class NamedItemStack implements Cloneable{
         // Added multiline lore support
         // Splits the lines
         String[] loreLines = lore.split("\n");
-        itemLore = (ArrayList<String>) Arrays.asList(loreLines);
+        itemLore.clear();
+        itemLore.addAll(Arrays.asList(loreLines));
         updateLoreAndStats();
         return this;
     }
@@ -212,11 +268,10 @@ public class NamedItemStack implements Cloneable{
             // returns empty list
             return new int[]{-1,-1,-1};
         }
-        int colorID = getDisplay().getInt("color");
         
-        int red = colorID >> 16;
-        int green = (colorID - (red << 16) >> 8);
-        int blue = colorID - (red << 16) - (green << 8);
+        int red = itemColor >> 16;
+        int green = (itemColor - (red << 16) >> 8);
+        int blue = itemColor - (red << 16) - (green << 8);
         
         return new int[]{red,green,blue};
     }
@@ -249,23 +304,23 @@ public class NamedItemStack implements Cloneable{
             this.addDisplay();
         }
         NBTTagCompound display = this.getDisplay();
-        NBTTagList NBTStatslist = new NBTTagList();
-        NBTTagList l = new NBTTagList();
+        NBTTagList NBTLorelist = new NBTTagList();
+        NBTTagList lore = new NBTTagList();
         // Add each stat line
-        for(String statName : itemStats.keySet())
+        for(String statName : itemDisplayStats.keySet())
         {
-             l.add(new NBTTagString("", itemStatsStartColor + statName + ": " + itemStats.get(statName)));
-             //add stats to a seperate NBT tag for easy access
-             NBTStatslist.add(new NBTTagString(statName, itemStats.get(statName)));
+             lore.add(new NBTTagString("", itemStatsStartColor + statName + ": " + itemDisplayStats.get(statName)));
         }
         // Add each lore line
         for(String loreLine : itemLore)
         {
-             l.add(new NBTTagString("", ChatColor.ITALIC.toString() + itemLoreStartColor.toString() + loreLine));
+            NBTTagString nbtTagString = new NBTTagString("", ChatColor.ITALIC.toString() + itemLoreStartColor.toString() + loreLine);
+            lore.add(nbtTagString);
+            NBTLorelist.add(nbtTagString);
         }
         // Set the stats & lore
-        display.set("Lore", l);
-        itemStack.getTag().set("Stats", NBTStatslist);
+        display.set("Lore", lore);
+        getTag().set("Lore", NBTLorelist);
     }
     
     public ItemStack getItemStack(){

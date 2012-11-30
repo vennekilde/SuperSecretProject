@@ -22,7 +22,13 @@ public class Weapon extends Item implements Cloneable{
     public void setDamagePerHit(int minDamage, int maxDamage){
         this.minDamage = minDamage;
         this.maxDamage = maxDamage;
-        this.setStat("Damage", "" + (minDamage == maxDamage ? minDamage : (minDamage + " - " + maxDamage)));
+        this.setStat("minDamage", minDamage);
+        this.setDisplayStat("Damage", "" + (minDamage == maxDamage ? minDamage : (minDamage + " - " + maxDamage)));
+        if(minDamage != maxDamage){
+            this.setStat("maxDamage", maxDamage);
+        } else {
+            this.removeStat("maxDamage");
+        }
     }
     public int[] getDamagePerHit() throws NoDamageSetException{
         if(!isDamageSet()){

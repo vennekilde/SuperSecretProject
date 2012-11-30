@@ -15,7 +15,8 @@ public class Armor extends Item implements Cloneable{
     }
     public void setDefence(int defence){
         this.defence = defence;
-        this.setStat("Defence", ""+defence);
+        this.setStat("Defence", defence);
+        this.setDisplayStat("Defence", ""+defence);
     }
     public int getDefence() throws NoDefenceSetException{
         if(isDefenceSet()){
