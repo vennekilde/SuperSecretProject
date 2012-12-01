@@ -66,7 +66,7 @@ public abstract class RandomSpawnBox extends PolygonTriggerBox{
     private void spawnEntities(EntitySpawner entitySpawner, double fillRate){
         int n = (int) (getArea() * fillRate);
         for(int i = 0; i < n; i++){
-            Location randomLocation = getRandomLocationInsideBox();
+            Location randomLocation = getRandomLocationInsideBoxOnGround();
             entitySpawner.spawnEntity(randomLocation);
         }
     }
@@ -76,9 +76,9 @@ public abstract class RandomSpawnBox extends PolygonTriggerBox{
         for(EntitySpawner entitySpawner : deathEntities.keySet()){
             Long timeSinceDeath = deathEntities.get(entitySpawner);
             if(currentTimeMillis - timeSinceDeath >= entitySpawner.getRespawnTime()){
-                Location randomLocationInsideBox = this.getRandomLocationInsideBox();
-                BasicEntity spawnedEntity = entitySpawner.spawnEntity(this.getRandomLocationInsideBox());
-                spawnedEntitiesLocations.put(spawnedEntity.getBaseEntity(), randomLocationInsideBox);
+                Location randomLocationInsideBoxOnGround = getRandomLocationInsideBoxOnGround();
+                BasicEntity spawnedEntity = entitySpawner.spawnEntity(getRandomLocationInsideBoxOnGround());
+                spawnedEntitiesLocations.put(spawnedEntity.getBaseEntity(), randomLocationInsideBoxOnGround);
                 spawnedEntitiesSpawner.put(spawnedEntity.getBaseEntity(), entitySpawner);
                 deathEntities.remove(entitySpawner);
             }

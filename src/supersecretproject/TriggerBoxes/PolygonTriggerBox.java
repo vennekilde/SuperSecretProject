@@ -136,4 +136,29 @@ public abstract class PolygonTriggerBox extends TriggerBox{
                 minY + Math.random() * (maxY - minY),   //Y
                 simpleCentroid.getY());                 //Z
     }
+    public Location getRandomLocationInsideBoxOnGround(){
+        Location location = null;
+        for(int i = 0; i < 100; i++){
+            location = getRandomLocationInsideBox();
+            ArrayList<Integer> possibleY = new ArrayList();
+
+            boolean lastBlockEmpty = false;
+            for(int y = (int) minY; y < maxY; y++){
+                int blockTypeIdAt = getWorld().getBlockTypeIdAt(location.getBlockX(), y, location.getBlockZ());
+                if(blockTypeIdAt == 0){
+                    if(!lastBlockEmpty){
+                        possibleY.add(y);
+                    }
+                    lastBlockEmpty = true;
+                } else {
+                    lastBlockEmpty = false;
+                }
+            }
+            if(!possibleY.isEmpty()){
+                location.setY(possibleY.get((int)(Math.random() * possibleY.size())));
+                return location;
+            }
+        }
+        return location;
+    }
 }
