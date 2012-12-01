@@ -8,6 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -86,6 +87,7 @@ public abstract class TriggerBox implements Listener{
         }
     }
     public abstract boolean isInside(Location location);
+    public abstract Location getRandomLocationInsideBox();
     public abstract void entered(Entity entity);
     public abstract void left(Entity entity);
 
@@ -146,6 +148,7 @@ public abstract class TriggerBox implements Listener{
     public void setWorld(World world) {
         this.world = world;
     }
-    
-    
+    public void delete(){
+        HandlerList.unregisterAll(this);
+    }
 }

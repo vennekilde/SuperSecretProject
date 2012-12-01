@@ -38,11 +38,17 @@ public class PrecisePoint extends Point2D{
         this.y = y;
     }
     
-    public double angleFrom(PrecisePoint location){
+    public double angleFrom(Point2D location){
         return Math.atan2(y - location.getY(), location.getX() - x);
     }
     public double angleFrom(Point location){
         return Math.atan2(y - location.getY(), location.getX() - x);
+    }
+    public static double angleFrom(Point2D location1, Point2D location2){
+        return Math.atan2(location2.getY() - location1.getY(), location1.getX() - location2.getX());
+    }
+    public static double angleFrom(Point location1, Point location2){
+        return Math.atan2(location2.getY() - location1.getY(), location1.getX() - location2.getX());
     }
     
     public final Dimension toDimension(){

@@ -84,9 +84,9 @@ public abstract class Instance extends InstanceStageLoader implements Reward{
     }
     public void finish(){
         ended = true;
+        HandlerList.unregisterAll(this);
         getReward().giveReward();
         InstanceManager.removeActiveInstance(this);
-        HandlerList.unregisterAll(this);
     }
     public void nextStage(){
         if(!ended){

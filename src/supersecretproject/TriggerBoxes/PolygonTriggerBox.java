@@ -4,15 +4,19 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 
 public abstract class PolygonTriggerBox extends TriggerBox{
 
     private ArrayList<Point2D> polygon;
     private double minY;
     private double maxY;
+    private double radius = 0;
+    private Point2D simpleCentroid = null;
     
     public PolygonTriggerBox(ArrayList<Location> polygon) throws Exception{
         super(polygon.get(0).getWorld());
+        recalculateRadiusAndCentroid();
         for(Location location : polygon){
             if(!location.getWorld().equals(getWorld())){
                 throw new Exception("Some locations are not in the same world");
@@ -25,10 +29,10 @@ public abstract class PolygonTriggerBox extends TriggerBox{
     }
     public PolygonTriggerBox(ArrayList<Location> polygon, double minY, double maxY) throws Exception{
         super(polygon.get(0).getWorld());
+        recalculateRadiusAndCentroid();
         if(minY > maxY){
-            double tempMinY = minY;
             this.minY = maxY;
-            this.maxY = tempMinY;
+            this.maxY = minY;
         } else {
             this.minY = minY;
             this.maxY = maxY;
@@ -43,21 +47,59 @@ public abstract class PolygonTriggerBox extends TriggerBox{
     }
     public PolygonTriggerBox(ArrayList<Point2D> polygon, World world, double minY, double maxY) throws Exception{
         super(world);
+        recalculateRadiusAndCentroid();
         this.polygon = polygon;
         if(minY > maxY){
-            double tempMinY = minY;
             this.minY = maxY;
-            this.maxY = tempMinY;
+            this.maxY = minY;
         } else {
             this.minY = minY;
             this.maxY = maxY;
         }
     }
     
+    // return getArea of polygon
+    public double getArea() { return Math.abs(getSignedArea()); }
+
+    // return signed getArea of polygon
+    public double getSignedArea() {
+        double sum = 0.0;
+        for (int i = 0; i < polygon.size()-1; i++) {
+            sum = sum + (polygon.get(i).getX() * polygon.get(i+1).getY()) - (polygon.get(i).getY() * polygon.get(i+1).getX());
+        }
+        return 0.5 * sum;
+    }
+    
+    private void recalculateRadiusAndCentroid(){
+        double longestDiameter = 0;
+        Point2D usedPoint1 = null;
+        Point2D usedPoint2 = null;
+        for(Point2D point : polygon){
+            for(Point2D point2 : polygon){
+                double distance = point.distance(point2);
+                if(distance > longestDiameter){
+                    longestDiameter = distance;
+                    usedPoint1 = point;
+                    usedPoint2 = point2;
+                }
+            }
+        }
+        radius = longestDiameter/2;
+        double angle = PrecisePoint.angleFrom(usedPoint1, usedPoint2);
+        simpleCentroid = new PrecisePoint(usedPoint1.getX() + (Math.cos(angle) * radius),usedPoint1.getY() + (Math.sin(angle) * radius));
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+    public Point2D getSimpleCentroid(){
+        return simpleCentroid;
+    }
+    
     @Override
     public boolean isInside(Location location) {
-        //fast and easy check to see if the location is inside the box
-        if(location.getY() < minY || maxY < location.getY() || location.getWorld().equals(getWorld())){
+        //fast and easy check to see if the location is not inside the box
+        if(location.getY() < minY || maxY < location.getY() || !location.getWorld().equals(getWorld())){
             return false;
         }
         int i;
@@ -72,4 +114,26 @@ public abstract class PolygonTriggerBox extends TriggerBox{
         return result;
     }
 
+    @Override
+    public Location getRandomLocationInsideBox() {
+        Point2D simpleCentroid1 = getSimpleCentroid();
+        for(int i = 0; i < 100; i++){
+            double randomAngle = Math.random() * Math.PI * 2;
+            double randomRadius = Math.random() * getRadius();
+            double x = Math.cos(randomAngle) * randomRadius + simpleCentroid1.getX();
+            double z = Math.sin(randomAngle) * randomRadius + simpleCentroid1.getY();
+            double y = minY + Math.random() * (maxY - minY);
+            Location location = new Location(getWorld(),x,y,z);
+            if(isInside(location)){
+                return location;
+            }
+        }
+        //in case it does not find a random point inside the polygon within 
+        //100 tries, it will return the simple centroid
+        return new Location(
+                getWorld(),                             //world
+                simpleCentroid.getX(),                  //X
+                minY + Math.random() * (maxY - minY),   //Y
+                simpleCentroid.getY());                 //Z
+    }
 }
