@@ -4,14 +4,15 @@ import info.jeppes.ZoneCore.Users.ZoneUser;
 import info.jeppes.ZoneCore.ZoneCore;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import supersecretproject.Instances.Instance;
-import supersecretproject.Items.NamedItemStack;
-import supersecretproject.Items.Weapon;
+import supersecretproject.Materials.ItemStackWrapper;
+import supersecretproject.Materials.Items.Weapon;
 
 public class TestInstance extends Instance{
     
@@ -46,20 +47,19 @@ public class TestInstance extends Instance{
         mightySword.setLore("This sword has been used by\nsome of the best warriors in Minecraft",ChatColor.GRAY);
         
         
-        NamedItemStack helmet = new NamedItemStack(ChatColor.RED+"Vision of Hatred",new ItemStack(Material.LEATHER_HELMET));
+        ItemStackWrapper helmet = new ItemStackWrapper(ChatColor.RED+"Vision of Hatred",new ItemStack(Material.LEATHER_HELMET));
         helmet.setItemColor(255, 0, 0);
-        NamedItemStack armor = new NamedItemStack(ChatColor.RED+"Hells Flame",new ItemStack(Material.LEATHER_CHESTPLATE));
+        ItemStackWrapper armor = new ItemStackWrapper(ChatColor.RED+"Hells Flame",new ItemStack(Material.LEATHER_CHESTPLATE));
         armor.setItemColor(255, 0, 0);
-        NamedItemStack leggings = new NamedItemStack(ChatColor.RED+"Nether Waders",new ItemStack(Material.LEATHER_LEGGINGS));
+        ItemStackWrapper leggings = new ItemStackWrapper(ChatColor.RED+"Nether Waders",new ItemStack(Material.LEATHER_LEGGINGS));
         leggings.setItemColor(255, 0, 0);
-        NamedItemStack boots = new NamedItemStack(ChatColor.RED+"Walking Fire",new ItemStack(Material.LEATHER_BOOTS));
+        ItemStackWrapper boots = new ItemStackWrapper(ChatColor.RED+"Walking Fire",new ItemStack(Material.LEATHER_BOOTS));
         boots.setItemColor(255, 0, 0);
         
         Weapon bestBowEver = new Weapon(new ItemStack(Material.BOW));
         bestBowEver.setName("Herobrines Siege Bow");
         bestBowEver.setLore("One hit kill...");
         bestBowEver.setDamagePerHit(100,200);
-        
         
         for(ZoneUser player : getPlayers()){
             player.getInventory().addItem(mightySword.getItemStack().clone());

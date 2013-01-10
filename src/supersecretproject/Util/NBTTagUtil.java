@@ -1,37 +1,28 @@
 package supersecretproject.Util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import net.minecraft.server.NBTBase;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagDouble;
-import net.minecraft.server.NBTTagInt;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.NBTTagString;
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.entity.Entity;
+import net.minecraft.server.v1_4_6.NBTBase;
+import net.minecraft.server.v1_4_6.NBTTagCompound;
+import net.minecraft.server.v1_4_6.NBTTagDouble;
+import net.minecraft.server.v1_4_6.NBTTagInt;
+import net.minecraft.server.v1_4_6.NBTTagList;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import supersecretproject.Exceptions.StatNotfoundExcpetion;
 
 public class NBTTagUtil {
     
     public static NBTTagCompound getTag(ItemStack item) {
-        return ((CraftItemStack)item).getHandle().getTag();
+        return CraftItemStack.asNMSCopy(item).getTag();
     }
     
     public static boolean hasDisplay(ItemStack item) {
-        return ((CraftItemStack)item).getHandle().getTag().hasKey("display");
+        return getTag(item).hasKey("display");
     }
     public static NBTTagCompound getDisplay(ItemStack item) {
         return getTag(item).getCompound("display");
     }
     public static void addDisplay(ItemStack item) {
-        ((CraftItemStack)item).getHandle().getTag().setCompound("display", new NBTTagCompound());
+        getTag(item).setCompound("display", new NBTTagCompound());
     }
  
     public static String getName(ItemStack item) {
@@ -51,7 +42,7 @@ public class NBTTagUtil {
         }
         NBTTagCompound display = getDisplay(item);
         if (name == null) {
-            display.remove("Name");
+            display.set("Name", null);
         }
         display.setString("Name", name);
         return item;
@@ -243,7 +234,7 @@ public class NBTTagUtil {
         
         NBTTagCompound display = this.getDisplay(item);
         if(red < 0 || green < 0 || blue < 0){
-            display.remove("color");
+            display.set("color", null);
             return item;
         }
         

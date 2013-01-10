@@ -2,7 +2,7 @@ package supersecretproject;
 
 import info.jeppes.ZoneCore.ZoneConfig;
 import info.jeppes.ZoneCore.ZonePlugin;
-import supersecretproject.Items.ItemManager;
+import supersecretproject.Materials.ItemManager;
 import supersecretproject.Util.MSG;
 
 public class SuperSecretProject extends ZonePlugin{
